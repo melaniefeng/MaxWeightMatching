@@ -38,6 +38,61 @@ public class Scheduling{
 		return 0;
 		
 	}
+	public double shiftDown(Job x, int nextAvail) {
+		Job toShift = x;
+		double newWeight = 0;
+		int toShiftTime = toShift.matchedSlot;
+		for(int i = toShiftTime+1; i < nextAvail; i++) {
+			
+			Job jobAtI = getJobByName(matchedEdges[i]);
+			
+			if(jobAtI.matchedSlot < jobAtI.deadline) {
+				//jobAtI can possibly shift down too, now the job toShift is jobAtI
+				toShift.matchedSlot = jobAtI.matchedSlot;
+				jobAtI.matchedSlot = -1; //jobAtI becomes unmatched
+				matchedEdges[toShift.matchedSlot] = jobAtI.jobID;
+				matchedEdges[jobAtI.matchedSlot] = -1;
+				matchedWeights[toShift.matchedSlot] = weight(toShift, toShift.matchedSlot);
+				matchedWeights[jobAtI.matchedSlot] = 0;
+				newWeight += weight(toShift, toShift.matchedSlot);
+				toShift = jobAtI;
+				//point to Shift to be the jobAtI.
+			}
+			else {
+				newWeight += weight(jobAtI, jobAtI.matchedSlot);
+			}
+			// otherwise, toShift will skip jobAtI.
+				
+			
+			//if you can shift directly down, do that. otherwise, skip the timeslot that cannot be taken.
+			
+		}
+		
+	
+		toShift.matchedSlot = nextAvail;
+		newWeight += weight(toShift, toShift.matchedSlot);
+		matchedEdges[toShift.matchedSlot] = toShift.jobID;
+		matchedWeights[toShift.matchedSlot] = weight(toShift, toShift.matchedSlot);
+	
+			
+		
+		return newWeight;
+		
+	}
+	public Job getJobByName(int jobName) {
+		for(int i = 0; i < jobs.size(); i++) {
+			if(jobName == jobs.get(i).jobID)
+				return jobs.get(i);
+		}
+		return null;
+	}
+	public double switchDown() {
+		double newWeight = 0;
+		
+		
+		
+		return newWeight;
+	}
 	public void match() {
 		int nextAvail = 0;
 		
@@ -64,6 +119,7 @@ public class Scheduling{
 		
 					if(highNew + xNew > matchedWeights[possSwitch.matchedSlot]) {
 						//it's better to switch than to not schedule job x
+						//BUT it's better to shift down everything (if possible) than to switch 
 						int xTime = possSwitch.matchedSlot;
 						possSwitch.matchedSlot = nextAvail;
 						x.matchedSlot = xTime;
@@ -142,6 +198,7 @@ class Job{
 		matchedSlot = -1;
 		
 	}
+	
 	// job can have matchedSlot <= deadline
 }
 
