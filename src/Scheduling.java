@@ -38,23 +38,23 @@ public class Scheduling{
 		return 0;
 		
 	}
-	public double shiftDown(Job x, int nextAvail) {
+	public double shiftDown(Job x, int nextAvail, int[] matchedEdgesTemp) {
+		
+		//if the return value of shiftDown is > not scheduling a job, set matchedEdges to be matchedEdgesTemp
 		Job toShift = x;
 		double newWeight = 0;
 		int toShiftTime = toShift.matchedSlot;
 		for(int i = toShiftTime+1; i < nextAvail; i++) {
 			
-			Job jobAtI = getJobByName(matchedEdges[i]);
+			Job jobAtI = getJobByName(matchedEdgesTemp[i]);
 			
 			if(jobAtI.matchedSlot < jobAtI.deadline) {
 				//jobAtI can possibly shift down too, now the job toShift is jobAtI
-				toShift.matchedSlot = jobAtI.matchedSlot;
-				jobAtI.matchedSlot = -1; //jobAtI becomes unmatched
-				matchedEdges[toShift.matchedSlot] = jobAtI.jobID;
-				matchedEdges[jobAtI.matchedSlot] = -1;
-				matchedWeights[toShift.matchedSlot] = weight(toShift, toShift.matchedSlot);
-				matchedWeights[jobAtI.matchedSlot] = 0;
-				newWeight += weight(toShift, toShift.matchedSlot);
+				matchedEdgesTemp[i] = toShift.jobID;
+				//toShift.matchedSlot = i;
+				//jobAtI.matchedSlot = -1; //jobAtI becomes unmatched
+				
+				newWeight += weight(toShift, i);
 				toShift = jobAtI;
 				//point to Shift to be the jobAtI.
 			}
@@ -69,10 +69,10 @@ public class Scheduling{
 		}
 		
 	
-		toShift.matchedSlot = nextAvail;
-		newWeight += weight(toShift, toShift.matchedSlot);
-		matchedEdges[toShift.matchedSlot] = toShift.jobID;
-		matchedWeights[toShift.matchedSlot] = weight(toShift, toShift.matchedSlot);
+		//toShift.matchedSlot = nextAvail;
+		newWeight += weight(toShift, nextAvail);
+		matchedEdgesTemp[nextAvail] = toShift.jobID;
+		//matchedWeights[nextAvail] = weight(toShift, nextAvail);
 	
 			
 		
